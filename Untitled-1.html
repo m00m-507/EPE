@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinical Medicine — Study Questions</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --surface2: #f2efe9;
+    --border: #e0dbd2;
+    --text: #1a1814;
+    --muted: #6b6560;
+    --accent: #1d4e3f;
+    --accent-light: #e8f3ee;
+    --accent-mid: #2d7a63;
+    --tag-bg: #eef6f2;
+    --tag-text: #1d4e3f;
+    --answer-bg: #f0faf5;
+    --answer-border: #2d7a63;
+    --number-bg: #1d4e3f;
+    --number-text: #ffffff;
+    --option-hover: #f5faf8;
+  }
+
+  body {
+    font-family: 'Figtree', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--accent);
+    color: #fff;
+    padding: 3rem 2rem 2.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .site-header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 40px,
+      rgba(255,255,255,0.025) 40px,
+      rgba(255,255,255,0.025) 80px
+    );
+  }
+  .site-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    letter-spacing: -0.01em;
+    position: relative;
+    margin-bottom: 0.5rem;
+  }
+  .site-header p {
+    font-size: 0.95rem;
+    opacity: 0.75;
+    position: relative;
+  }
+
+  /* ── NAV ── */
+  .nav-strip {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-strip::-webkit-scrollbar { display: none; }
+  .nav-btn {
+    padding: 0.85rem 1.1rem;
+    font-family: 'Figtree', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--muted);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s, border-color 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .nav-btn:hover { color: var(--accent); }
+  .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent-mid); }
+
+  /* ── MAIN ── */
+  .main-wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  /* ── SECTION ── */
+  .topic-section {
+    display: none;
+  }
+  .topic-section.visible {
+    display: block;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.55rem;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+    padding-top: 0.5rem;
+  }
+  .section-meta {
+    font-size: 0.83rem;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── QUESTION CARD ── */
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1.4rem;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .q-card:hover {
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  .q-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem 1.4rem 0.9rem;
+  }
+  .q-num {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    background: var(--number-bg);
+    color: var(--number-text);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .q-text {
+    font-size: 0.97rem;
+    line-height: 1.65;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .q-options {
+    padding: 0 1.4rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .q-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 7px;
+    margin-bottom: 3px;
+    transition: background 0.15s;
+    cursor: default;
+  }
+  .q-option:hover {
+    background: var(--option-hover);
+  }
+  .opt-letter {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+  .opt-text {
+    font-size: 0.91rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .q-option.correct .opt-letter {
+    background: var(--answer-border);
+    border-color: var(--answer-border);
+    color: white;
+  }
+  .q-option.correct .opt-text {
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .q-option.correct {
+    background: var(--answer-bg);
+  }
+
+  .q-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.4rem 1rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .answer-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+  .answer-val {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--accent-mid);
+    background: var(--accent-light);
+    padding: 2px 10px;
+    border-radius: 20px;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-bar-wrap {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 99px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent-mid);
+    border-radius: 99px;
+  }
+
+  /* ── TOPIC COUNT BADGE ── */
+  .count-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    padding: 1px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin-left: 6px;
+  }
+
+  @media (max-width: 600px) {
+    .q-header { padding: 1rem 1rem 0.75rem; }
+    .q-options { padding: 0 1rem 0; }
+    .q-footer { padding: 0.65rem 1rem 0.85rem; }
+    .site-header { padding: 2rem 1rem 1.75rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <h1>Clinical Medicine — Study Questions</h1>
+  <p>Multiple choice review questions · organised by topic</p>
+</header>
+
+<nav class="nav-strip" id="topicNav">
+  <button class="nav-btn active" onclick="showTopic('t1', this)">Patient Rights &amp; Consent <span class="count-badge">15</span></button>
+  <button class="nav-btn" onclick="showTopic('t2', this)">Personal &amp; Social History <span class="count-badge">15</span></button>
+  <button class="nav-btn" onclick="showTopic('t3', this)">HPI &amp; Documentation <span class="count-badge">15</span></button>
+  <button class="nav-btn" onclick="showTopic('t4', this)">Presenting Symptom <span class="count-badge">15</span></button>
+  <button class="nav-btn" onclick="showTopic('t5', this)">General Examination <span class="count-badge">15</span></button>
+  <button class="nav-btn" onclick="showTopic('t6', this)">Physical Examination I <span class="count-badge">15</span></button>
+  <button class="nav-btn" onclick="showTopic('t7', this)">Physical Examination II <span class="count-badge">15</span></button>
+  <button class="nav-btn" onclick="showTopic('t8', this)">Vital Signs <span class="count-badge">15</span></button>
+  <button class="nav-btn" onclick="showTopic('t9', this)">Blood Pressure &amp; Transfusion <span class="count-badge">15</span></button>
+  <button class="nav-btn" onclick="showTopic('t10', this)">Musculoskeletal History <span class="count-badge">15</span></button>
+  <button class="nav-btn" onclick="showTopic('t11', this)">Injections &amp; Venepuncture <span class="count-badge">15</span></button>
+</nav>
+
+<main class="main-wrap">
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 1 — Patient Rights & Consent
+═══════════════════════════════════════════════ -->
+<section id="t1" class="topic-section visible">
+  <h2 class="section-title">Patient Rights &amp; Consent</h2>
+  <p class="section-meta">15 questions · Patient rights, informed consent, capacity, and communication</p>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q1</div><div class="q-text">According to the text, patient rights fall into seven general areas. Which of the following is NOT one of these areas?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Information disclosures</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Participation in treatment decisions</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Guaranteed complete cure of the disease</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Choice of providers and plans</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q2</div><div class="q-text">Which of the following is considered a "Patient Responsibility"?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Ensuring the financial profitability of the hospital.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Reporting unexpected changes in their condition to the healthcare provider.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Formulating their own surgical treatment plan.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Instructing the nurses on how to administer medications.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q3</div><div class="q-text">Regarding Informed Consent, who is considered the best choice to speak to the patient and discuss the diagnosis and treatment?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">The primary nurse handling the patient.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">The hospital's legal advisor.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Physicians themselves (rather than related health care professionals).</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Medical students observing the case.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q4</div><div class="q-text">To have the "CAPACITY" to give informed consent, a patient must meet four criteria. Which of the following is ONE of these criteria?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">The client can remember all of the information necessary to make a decision.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">The client must be completely free of any psychological stress.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">The client must have a high level of medical education.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">The client can write their decision independently without gestures.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q5</div><div class="q-text">A critical note regarding a patient's "Capacity" to make decisions is that:</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">It is permanent once established by a psychiatrist.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">It can fluctuate; a client may have capacity one day but not the next.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">It is strictly determined by the patient's age and nothing else.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">It is only required for high-risk surgical procedures.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q6</div><div class="q-text">When providing a blood sample, a client extends their arm so that the needle can be inserted without saying a word. What type of consent is this?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Written consent</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Verbal consent</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Implied consent</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Authoritative consent</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q7</div><div class="q-text">Written consent is generally only required in specific situations. Which of the following is an indication for Written Consent?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Intravenous cannula insertion.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Dental treatment.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">The proposed intervention poses a significant risk to the client.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Routine physical examinations.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q8</div><div class="q-text">Complete the famous quote mentioned in the text regarding the clinical encounter: "The good physician treats the disease; the great physician treats..."</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">"...the symptoms completely and rapidly."</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">"...the patient who has the disease."</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">"...the underlying physiological causes."</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">"...the family members of the patient."</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q9</div><div class="q-text">When taking a patient's history, what is the best practice regarding note-taking?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">Do not write every word, write down key words only.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Write down every single word to ensure a complete legal document.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Do not take any notes until the patient has left the room.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Memorize everything to maintain constant eye contact.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q10</div><div class="q-text">If the patient does not tell their story in order, how should your final written medical record be structured?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Exactly as the patient narrated it, jumping between timelines.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">It must be organized, following a logical sequence describing how the illness began and developed.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">You should only record the diagnosis and ignore the history.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Ask the patient to rewrite their history themselves.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q11</div><div class="q-text">To build rapport with the patient, you should use "Active Listening". This involves:</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Interrupting the patient frequently to refocus the conversation.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Showing interest, nodding, and allowing the patient time to speak.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Looking at your watch to manage time effectively.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Writing the full medical record while the patient is speaking.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q12</div><div class="q-text">What is the fundamental rule regarding documentation in medical interactions?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">If the patient agrees verbally, documentation is optional.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">If it isn't written down, it didn't happen!</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Medical notes are only for personal use and are not legal documents.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Documentation is only required for surgical procedures.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q13</div><div class="q-text">If a patient is unable to communicate and third parties (e.g., relatives) approach you to speak about the patient, what is your professional boundary?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">You can share the full medical history to get their help.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">You may listen to what they say, but you cannot share any medical details unless the patient has given explicit consent.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">You must refuse to listen to them entirely.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">You should ask them to sign an implied consent form.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q14</div><div class="q-text">If a relative tells you about a very sensitive issue regarding the patient (e.g., domestic violence), what is the correct action?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Document it immediately as an established diagnosis.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Confront the relative about the situation.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Explore it carefully and respectfully with the patient, without making assumptions, only if clinically relevant.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Ignore the information entirely to avoid legal trouble.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q15</div><div class="q-text">Real-life history taking is often complicated by anxiety, pain, or language barriers. According to the text, helping the patient tell their story requires:</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Speed, accuracy, and medication.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Patience, empathy, and respect.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Chaperones, interpreters, and family members.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Sympathy, firmness, and detailed questionnaires.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 2 — Personal & Social History
+═══════════════════════════════════════════════ -->
+<section id="t2" class="topic-section">
+  <h2 class="section-title">Personal &amp; Social History</h2>
+  <p class="section-meta">15 questions · Occupational history, smoking, alcohol, ethnicity, and pack-years</p>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q1</div><div class="q-text">A patient has worked as a shipyard worker for many years. What occupational disorder must you keep in mind based on this occupational history?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Silicosis</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Mesothelioma</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Occupational asthma</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Farmer's lung</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q2</div><div class="q-text">A patient complains of respiratory symptoms, and when asked about their hobbies, they mention keeping birds. What condition is linked to this hobby according to the history?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Silicosis</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Vibration white finger</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Bird fancier's lung</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Pleural plaques</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q3</div><div class="q-text">Why is it highly important to ask the patient about their ethnic background while taking the Personal History?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">To determine their education level and ability to understand the disease</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Because some genetic diseases, like sickle cell disease, are more frequent in certain ethnicities</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">To plan for their discharge after leaving the hospital</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">To know if they need help during their illness</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q4</div><div class="q-text">A patient states they smoke 40 cigarettes a day (i.e., 2 packs of 20 cigarettes) and have been doing so for 10 years. How do you record this in pack-years on your sheet?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">10 pack-years</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">20 pack-years</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">30 pack-years</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">40 pack-years</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q5</div><div class="q-text">Regarding the assessment of Alcohol Use, which of the following is considered a definition of "Risky drinking" according to the provided criteria?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Drinking more than 1 drink per day</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Drinking more than 2 drinks per day</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Having zero alcohol-free days per week</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Drinking more than 5 drinks per week for women</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q6</div><div class="q-text">While screening a male patient for alcohol misuse, what direct question do you ask regarding the number of times in the past year they drank a certain amount in a single day?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">"How many times have you had 3 or more drinks in one day?"</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">"How many times have you had 4 or more drinks in one day?"</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">"How many times have you had 5 or more drinks in one day?"</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">"How many times have you had 6 or more drinks in one day?"</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q7</div><div class="q-text">The first and most important step when letting the patient tell their Presenting Symptom (PS) or Chief Complaint is to:</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Ask very specific closed questions so you don't waste clinic time</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Interrupt them immediately if they give irrelevant details</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Allow the patient to speak freely at first without interruption</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Ask immediately about their current medications to assess severity</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q8</div><div class="q-text">If a patient uses medical terms like "migraine" or "gastric" while describing their symptoms, how should you, as a doctor, proceed?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Ignore the word and continue taking the history normally</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Ask them what they mean by the term, as interpretation varies among different people</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Write the word immediately as a final diagnosis in the patient file</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Explain the correct academic medical meaning of the word to correct them</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q9</div><div class="q-text">You ask a patient about the onset of their symptom, and they give a vague answer, saying, "a long time, doctor." What is the best action to take?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Record "a long time" exactly as it is in your notes</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Gently offer time ranges, asking, "Do you mean hours, days, or weeks?"</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Ignore the onset and move on to asking about radiation</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Refer them immediately for lab work because the history is inaccurate</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q10</div><div class="q-text">In the History of the Presenting Illness, the timing of symptoms provides important clues. If a patient complains of morning stiffness, this is a strong indicator of which disease?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Osteoarthritis</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Rheumatoid arthritis</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Decompression sickness</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Occupational asthma</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q11</div><div class="q-text">To properly assess the severity of a patient's symptom, the best approach is to ask:</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">"Does the pain travel anywhere else or is it localized?"</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">"Is this pain continuous or intermittent?"</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">"Does it interfere with your daily activities or sleep?"</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">"What makes this pain worse?"</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q12</div><div class="q-text">While applying the SOCRATES framework, we ask about radiation, but some symptoms do not radiate at all. Based on your textbook, which of the following symptoms does not radiate?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Chest pain</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Back pain</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Arm pain</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">Breathlessness</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q13</div><div class="q-text">A patient is suffering from breathlessness, and when asked about aggravating factors, they state it gets much worse when lying flat. What does this suggest as a preliminary diagnosis?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Angina</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Heart failure</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Pancreatitis</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Pulmonary embolism</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q14</div><div class="q-text">In the Exacerbating Factors &amp; Associated Symptoms section, if a patient complains of rectal bleeding, what factor strongly raises the concern for colon cancer?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">Strong family history</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Excessive smoking</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Recent travel or migration</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Working with industrial chemicals</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q15</div><div class="q-text">While taking the Current Treatment history from a female patient, what is a crucial "tip" to keep in mind?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Women rarely use herbal or alternative therapies</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Many women do not consider the contraceptive pill as "medicine," so you must ask directly</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Women frequently forget medication dosages, so you shouldn't bother asking</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Vitamins and supplements are not considered part of current treatment</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 3 — HPI & Documentation
+═══════════════════════════════════════════════ -->
+<section id="t3" class="topic-section">
+  <h2 class="section-title">HPI &amp; Documentation</h2>
+  <p class="section-meta">15 questions · Drug allergies, reproductive history, pedigree charts, and systematic enquiry</p>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q1</div><div class="q-text">During a clinical encounter, a patient informs you that they have a severe "allergy" to a prescribed narcotic analgesic. Upon further systematic questioning, the patient explains that the drug caused severe nausea. According to the textbook guidelines on documenting drug allergies, what is the most appropriate action?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Document it as a true allergic reaction to ensure the patient does not develop anaphylaxis in the future.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Disregard the symptom, as nausea is a universally expected and harmless occurrence with narcotics.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Recognize it as a side effect rather than a true allergy, but ensure the reaction is still fully documented in the notes.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Consider it an indication of a psychological intolerance and refer the patient for psychiatric evaluation.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q2</div><div class="q-text">You are documenting the reproductive history of a female patient presenting with abdominal pain. The shorthand notation in her file reads: Gravida 4, Para 2, 1-1-2-2. Based on the standard X-X-X-X shorthand sequence described in your textbook, what does the first number (1) in this sequence specifically represent?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">The number of pre-term infants.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">The number of full-term infants.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">The number of spontaneous abortions.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">The number of currently living children.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q3</div><div class="q-text">When a physician suspects an inherited disorder like haemophilia and constructs a pedigree chart, specific terminology and symbols are used. What is the correct term used to indicate the male identified as the index case around whom the entire pedigree chart is constructed?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Proposita</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Heterozygote</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Propositus</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Consanguineous case</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q4</div><div class="q-text">While obtaining the history of the presenting illness, you notice that the patient's timeline of events is chronologically obscure and some facts seem contradictory. Applying the clinical principles outlined by Sir William Osler, how should a proficient medical student handle this situation?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Accept the one-line answers provided to avoid rushing the interview and to maintain a therapeutic relationship.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Trust the patient completely without questioning, as exploring psychological matters might break rapport.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Skip the obscure chronological details and concentrate solely on the systems review.</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">Do not be content with the contradictions; apply the rule to "trust, but always verify".</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q5</div><div class="q-text">During the systematic enquiry of the gastrointestinal system, a patient complains of a specific symptom. You must distinguish carefully between different medical terms to document the history accurately. The patient states: "Doctor, it physically hurts and causes pain whenever I swallow my food." What is the precise medical term for this cardinal symptom?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Dysphagia</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Odynophagia</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Haematemesis</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Dysuria</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 4 — Presenting Symptom (SOCRATES)
+═══════════════════════════════════════════════ -->
+<section id="t4" class="topic-section">
+  <h2 class="section-title">Presenting Symptom &amp; SOCRATES</h2>
+  <p class="section-meta">Questions from topic sections on presenting complaint and systematic approach</p>
+
+  <p style="font-style:italic;color:var(--muted);font-size:0.9rem;margin-bottom:1.5rem;">Note: The questions in this section come directly from the document's second question bank labeled "Question 1–15" covering SOCRATES, onset, character, and associated symptoms.</p>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q1</div><div class="q-text">A patient presented to the emergency department complaining of acute, very severe pain in a joint. This pain developed rapidly overnight. Based on the "Onset," what is the most likely diagnosis?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Inflammatory arthritis</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Septic arthritis</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Crystal arthritis (gout or pseudogout)</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Hemarthrosis</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q2</div><div class="q-text">A patient describes their pain as "penetrating, deep, or boring" and emphasizes that it is characteristically worse at night. This description (Character) is typical for which type of pain?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Fracture pain</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Bone pain</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Muscle pain</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Neuropathic shooting pain</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q3</div><div class="q-text">In a chronic diabetes mellitus patient, examination reveals grossly abnormal joints, but surprisingly, the patient is pain-free. What is the scientific explanation for the absence of pain in this case (Charcot joints)?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Complete muscle rupture reduces the pain.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Neurological involvement impaired joint sensation.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">The pain is referred to another dermatome.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">It is a benign bone tumour like osteoid osteoma.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q4</div><div class="q-text">When assessing patterns of joint involvement, a patient with Nodal osteoarthritis has a predilection for which of the following specific joints?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Small joints of the hands and feet symmetrically</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Medium or large joints like the knee only</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Distal interphalangeal (DIP) joints and the carpometacarpal (CMC) joint of the thumb</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">The spine and sacroiliac joints</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q5</div><div class="q-text">A female patient complains of joint stiffness. As a doctor, how can you confirm that this stiffness is due to inflammation (Inflammatory arthritis) rather than a mechanical cause?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">The stiffness eases rapidly on movement.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">The stiffness is characterized by an incomplete range of movement due to a loose body.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">The stiffness affects only the shoulder and pelvic areas.</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">The early-morning stiffness takes at least 30 minutes to wear off with activity.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q6</div><div class="q-text">A young man suffered a sports injury to his knee, and rapid swelling occurred within 30 minutes. The speed of onset of swelling in this case strongly suggests:</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Septic arthritis</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Hemarthrosis due to vascular or ligament injury</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Traumatic effusion due to articular cartilage abrasion</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Crystal-induced arthritis</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q7</div><div class="q-text">While evaluating associated symptoms, you noticed the presence of erythema (redness) accompanied by swelling in the DIP joints. This combination helps distinguish Heberden's nodes of osteoarthritis from which of the following conditions?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Rheumatoid arthritis</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Psoriatic arthritis</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Systemic lupus erythematosus (SLE)</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Palindromic rheumatism</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q8</div><div class="q-text">A patient is suffering from proximal muscle weakness. While taking the history, which systemic cause should you include in your differential diagnosis?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Nerve entrapment like carpal tunnel syndrome</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Endocrine disorders like hypothyroidism or excess glucocorticoids</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Joint disorders causing inhibition of function by pain</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Complete muscle rupture</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q9</div><div class="q-text">A patient tells you, "My finger gets stuck, and when I straighten it, it gives suddenly" (Triggering). What is the common anatomical cause for this condition in adults?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">A loose body within the joint</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Torn meniscus</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Nodular tendon thickening or fibrous thickening of the flexor sheath</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Loss of range of movement solely due to pain (Pseudo locking)</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q10</div><div class="q-text">While taking the past history of a patient suspected of having reactive arthritis, which of the following prior infections is considered directly relevant to their condition?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Gonorrhea or tuberculosis</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Syphilis</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Streptococcal pharyngitis, rubella, or dysentery</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Osteomyelitis</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q11</div><div class="q-text">A patient is experiencing hip pain. Where is this pain usually felt, and to where does it typically radiate?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Felt in the lower back, radiating to the scalp.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Felt in the groin, radiating to the thigh or knee.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Felt in the buttock, shooting down the back of the leg.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Felt in the lower leg, radiating to the foot.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q12</div><div class="q-text">Based on the family history mentioned in the reference, how much does the likelihood of developing rheumatoid arthritis increase in individuals who have an affected first-degree relative?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Two times more common</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Three times more common</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Four times more common</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Ten times more common</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q13</div><div class="q-text">During the modified GALS screen for arms assessment, you ask the patient to "touch the small of your back." Which joint movement are you testing now?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Shoulder abduction</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Shoulder external rotation</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Shoulder internal rotation</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Elbow extension</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q14</div><div class="q-text">In the GALS screen examination of the arms, to properly evaluate the power grip, you ask the patient to "make a tight fist." What is the sign that confirms the examination is normal?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">The patient should be able to touch fingertips to the thumb.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">The fingernails should be hidden.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">It should elicit the reverse prayer sign.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Squeezing across the 2nd–5th metacarpals causes no tenderness.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q15</div><div class="q-text">During the examination of the legs in the GALS screen, what is the normal range for hip flexion and knee flexion, respectively?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Hip flexion 135°, knee flexion 120°</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Hip flexion 90°, knee flexion 45°</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Hip flexion 15°, knee flexion 55°</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">Hip flexion 120°, knee flexion 135°</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 5 — General Examination (Observation)
+═══════════════════════════════════════════════ -->
+<section id="t5" class="topic-section">
+  <h2 class="section-title">General Examination — Observation</h2>
+  <p class="section-meta">15 questions · Clinical observation, gait, speech, hands, and early warning signs</p>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q1</div><div class="q-text">A medical student is examining a patient and trying to confirm if they have Mild jaundice. What is the best lighting they should use according to guidelines in order to observe this sign clearly?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Fluorescent light</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Natural light</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Pen torch light</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Otoscope light</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q2</div><div class="q-text">A junior doctor is preparing to examine a sick child. According to the rules of Privacy and Chaperones, who is the person that "must" be present during the examination?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">A senior consultant</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">A trained chaperone</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">A parent or guardian</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">A male nurse</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q3</div><div class="q-text">In an internal medicine ward, there has been an Outbreak of Clostridium difficile infection. What is the correct method of Hand hygiene that the doctor must follow after examining patients in this situation?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Alcohol-based formulation for 20 seconds</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Alcohol rub followed by drying with a towel</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Soap and water for at least 40 seconds</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Disposable gloves without handwashing</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q4</div><div class="q-text">A patient comes to your clinic in the middle of winter wearing very light summer clothing. Based on this Observation, what preliminary diagnosis might you consider as an Underlying condition causing Heat intolerance?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Hypothyroidism</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Thyrotoxicosis</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Cognitive impairment</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Parkinsonism</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q5</div><div class="q-text">A doctor is passing by a patient in the ward and notices a Portable oxygen cylinder next to the bed. What disease might the patient have based on this finding?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Type 1 Diabetes</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Pulmonary fibrosis</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Carpal tunnel syndrome</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Rheumatoid arthritis</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q6</div><div class="q-text">While observing a patient walking into the clinic, the doctor noticed that the patient walks with a Hemiplegic gait. This gait is considered a Pathognomonic sign for which of the following conditions?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Cerebellar disease</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Stroke</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Parkinsonism</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Diffuse cerebrovascular disease</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q7</div><div class="q-text">A patient is suffering from Jerky, involuntary movements (Chorea). These movements are characteristic of which of the following diseases?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">Huntington's disease</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Alcohol withdrawal</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Neuroleptic therapy side effect</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Cerebellar ataxia</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q8</div><div class="q-text">A patient shows Animated disinhibition in their behaviour and facial expressions during the Consultation. This may be an indicator of which of the following problems?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">Frontal lobe disease</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Parkinson's disease</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Myxedema</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Hypothyroidism</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q9</div><div class="q-text">During history taking, you notice the patient is suffering from Hoarseness in their voice. This symptom can occur as a result of Damage to which nerve?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Median nerve</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">T1 nerve root</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Recurrent laryngeal nerve</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Ulnar nerve</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q10</div><div class="q-text">A doctor greets a patient at the beginning of the Encounter, and notices the patient is unable to release their hand (Fails to release the handgrip) due to Delayed muscle relaxation. What diagnosis does this sign point to?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Acromegaly</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Rheumatoid arthritis</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Myotonic dystrophy</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Dupuytren's contracture</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q11</div><div class="q-text">A patient shakes your hand and you notice their hand is Hot and sweaty. Based on the Information gleaned from a handshake, what is the expected diagnosis?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Anxiety</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Raynaud's phenomenon</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Hyperthyroidism</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Hypothyroidism</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q12</div><div class="q-text">On clinical examination of a patient's hand, you find that the injury is concentrated in the Distal interphalangeal (DIP) joints. What is the closest diagnosis for this case?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Rheumatoid arthritis</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Osteoarthritis</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Carpal tunnel syndrome</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Cervical spondylosis</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q13</div><div class="q-text">A patient is suffering from Wasting of the thenar muscles in their hand. What cause from the following options could lead to this sign?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Ulnar nerve compression</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Median nerve compression</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Radial nerve damage</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Recurrent laryngeal nerve damage</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q14</div><div class="q-text">As a doctor, the first thing you do when you see the patient is a Rapid assessment to evaluate the severity of the condition. Which of the following is considered part of the Early warning scoring systems used to assess Unwell patients?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Hearing aid check</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Deep tendon reflexes</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Oxygen saturations and pain score</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Ophthalmoscopic examination</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q15</div><div class="q-text">A patient entered the clinic and you noticed on their face Apathy with Pale and puffy skin. These Facial features direct you to think of which diagnosis?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Parkinsonism</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Hypothyroidism</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Hyperthyroidism</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Depression</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 6 — Physical Examination I (General Principles)
+═══════════════════════════════════════════════ -->
+<section id="t6" class="topic-section">
+  <h2 class="section-title">Physical Examination I — General Principles</h2>
+  <p class="section-meta">15 questions · Part 1: Chaperones, gait, jaundice, cyanosis, and hand signs</p>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q1</div><div class="q-text">While preparing to conduct a physical examination, which of the following is considered standard practice regarding the use of a chaperone according to clinical guidelines?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">A chaperone is unnecessary if the doctor and the patient are of the same gender.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Chaperones are always appropriate for intimate (breast, genital, or rectal) examinations.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">If the patient declines a chaperone, the doctor must completely refrain from the examination.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Relatives are always the best choice as chaperones in all medical examinations.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q2</div><div class="q-text">You have just finished examining an inpatient during an outbreak of Clostridium difficile infection. What is the correct method for hand hygiene in this situation?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Using an alcohol-based hand rub for at least 20 seconds.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Using an alcohol-based hand rub and cleaning the stethoscope with an alcohol wipe.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Washing hands with soap and water because an alcohol rub is contraindicated.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Handwashing is unnecessary as long as you were wearing disposable gloves.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q3</div><div class="q-text">A patient presents to the clinic in the depths of winter wearing very light summer clothing. This observation is a strong clinical clue for which of the following conditions?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Hypothyroidism</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Thyrotoxicosis</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Cognitive impairment</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Alcohol dependence</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q4</div><div class="q-text">While observing a patient walking into the clinic, you notice they walk with very small steps (a 'walk of little steps' or 'petits pas'). This abnormal gait is most commonly associated with which underlying condition?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Cerebellar disease</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Stroke (Hemiplegia)</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Parkinsonism</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Huntington's disease</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q5</div><div class="q-text">A patient complains of generalized fatigue. While taking the history, you note a facial expression characterized by "apathy" along with "pale and puffy skin." This facial appearance strongly suggests which diagnosis?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Parkinsonism</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Hyperthyroidism</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Depression</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">Hypothyroidism</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q6</div><div class="q-text">Upon shaking the patient's hand, you notice a "delayed relaxation of grip," where the patient fails to release your hand easily. This physical sign is characteristic of which of the following rare diseases?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Acromegaly</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Myotonic dystrophy</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Rheumatoid arthritis</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Raynaud's phenomenon</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q7</div><div class="q-text">During your interaction with a patient, you notice "dysarthria" in their speech. This specific abnormality in the character of speech is most likely caused by which of the following conditions?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">Motor neuron disease</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Recurrent laryngeal nerve damage</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Myxedema</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Hyperthyroidism</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q8</div><div class="q-text">When examining the joints of the hands, if you find that arthritis primarily affects the distal interphalangeal (DIP) joints, which of the following diagnoses should you suspect the most?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Rheumatoid arthritis</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Osteoarthritis and psoriatic arthropathy</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Cervical spondylosis</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Carpal tunnel syndrome</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q9</div><div class="q-text">While examining a patient's hands, you notice prominent wasting in the thenar muscles. This clinical finding is seen in T1 nerve root damage and which of the following conditions?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Cervical spondylosis with nerve root entrapment</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Rheumatoid arthritis</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Carpal tunnel syndrome</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Dupuytren's contracture</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q10</div><div class="q-text">When conducting a general physical examination on a recumbent patient, what is the usual standard practice regarding the clinician's position?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Examining the patient from the left-hand side of the bed.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Examining the patient from the right-hand side of the bed.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Standing at the foot of the bed to evaluate symmetry first.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">There is no standard rule; the priority is the comfort of the patient and the doctor.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q11</div><div class="q-text">A clinician is examining a jaundiced patient and notes that the yellow discoloration is very prominent in the patient's sclera. What is the pathophysiological explanation for the specific detection of jaundice in the sclera?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">It is due to the increased vascularity and capillary beds in the conjunctiva.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Bilirubin has a strong affinity for elastic tissue, which is abundant in the sclera.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">It is the result of a chemical reaction between carotene pigment and bilirubin in the eye.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">It is caused by the generalized hyperpigmentation associated with chronic liver disease.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q12</div><div class="q-text">A patient presents with visible peripheral cyanosis in their hands. Upon palpation, you find that the hands are actually warm. This clinical picture is most consistent with which of the following scenarios?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Heart failure, due to low cardiac output and vasoconstriction.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Peripheral shutdown, due to increased sympathetic activity.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Chronic obstructive pulmonary disease (COPD), due to vasodilation from elevated arterial carbon dioxide levels.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Exposure to high altitude, leading to severe central hypoxaemia.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q13</div><div class="q-text">During an examination, you find that a patient has finger clubbing, but it is strictly unilateral (affecting only one limb). Which of the following causes best explains this asymmetrical presentation?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">A proximal vascular condition, such as an arteriovenous shunt for dialysis.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">A systemic autoimmune disease like systemic sclerosis.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Chronic hypoxaemia secondary to congenital heart disease.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Malabsorption syndrome or inflammatory bowel disease.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q14</div><div class="q-text">You are following up with a patient who has vitiligo (symmetrical depigmentation on the face, neck, and extensor aspects of the limbs). You must be aware that this condition is commonly associated with which of the following groups of disorders?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Thyrotoxicosis and chronic ITP.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Carotenemia and secondary adrenal insufficiency.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Sezary syndrome and erythroderma.</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">Pernicious anemia, diabetes mellitus, and thyroid disorders.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q15</div><div class="q-text">A patient presents with a fixed flexion deformity in the little and ring fingers. On examination, you palpate a thickening of the palmar fascia. What is this specific diagnosis, and how does it clinically differ from Arachnodactyly?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">This is Scleroderma, characterized by tight contracted skin, whereas Arachnodactyly is associated with Acromegaly.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">This is Dupuytren's contracture, whereas Arachnodactyly refers to the long, thin fingers typical of Marfan's syndrome.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">This is a case of Systemic sclerosis due to calcium deposits, whereas Arachnodactyly is a painless soft tissue swelling.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">This is Rheumatoid arthritis, whereas Arachnodactyly is caused by trauma, which is the most common cause of hand deformity.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 7 — Physical Examination II (Placeholder for short set)
+═══════════════════════════════════════════════ -->
+<section id="t7" class="topic-section">
+  <h2 class="section-title">Physical Examination II — Skin &amp; Systemic Clues</h2>
+  <p class="section-meta">This topic's questions are included within Physical Examination I above (Q11–Q15) as they appear as a single combined bank in the source document.</p>
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;color:var(--muted);font-size:0.92rem;">
+    The source document groups "Part 1: General Principles" and "Part 2: Hands, Skin, and Systemic Clues" as a single set of 15 questions. All 15 are shown under <strong>Physical Examination I</strong> in this viewer.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 8 — Vital Signs
+═══════════════════════════════════════════════ -->
+<section id="t8" class="topic-section">
+  <h2 class="section-title">Vital Signs</h2>
+  <p class="section-meta">15 questions · Temperature, pulse, respiration rate, and measurement techniques</p>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q1</div><div class="q-text">Before taking a patient's vital signs during the initial evaluation, if you find out they have recently consumed caffeine or exercised, how long should you wait to avoid the effect of these factors on the examination?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">15 minutes</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">20 minutes</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">30 minutes</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">60 minutes</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q2</div><div class="q-text">According to the American Medical Association (AMA) definition, when is a patient diagnosed with Hypothermia?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Drop of body temperature below 97.8°F</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Drop of body temperature below 96.0°F</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Drop of body temperature below 95.0°F</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Body temperature lower than the individual's normal steady state</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q3</div><div class="q-text">When measuring body temperature using the rectal method, what is the expected difference in the reading compared to the oral method for the same patient?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Rectal temperatures tend to be 0.3 to 0.4 °F lower than oral.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Rectal temperatures tend to be 0.7 to 0.9 °F lower than oral.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Rectal temperatures tend to be 0.7 to 0.9 °F higher than oral.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Rectal temperatures tend to be 1.4 °F higher than oral.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q4</div><div class="q-text">Which of the following temperature measurement methods is considered the least accurate but is most often used with pediatric patients?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Oral method</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Rectal method</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Tympanic method</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">Axillary method</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q5</div><div class="q-text">While assessing the core temperature using a tympanic digital thermometer, what is the potential effect of cerumen (ear wax) impaction on the reading?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">Can affect values by as much as 0.3 °F lower than the unobstructed ear.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Can affect values by as much as 0.4 °F lower than the unobstructed ear.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Can affect values by as much as 0.8 °C higher than the unobstructed ear.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Has no significant effect on the digital reading.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q6</div><div class="q-text">You are examining a newborn in the nursery. Based on the reference tables, what is the expected normal heart rate for this infant?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">120 – 160 bpm</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">100 – 130 bpm</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">70 – 120 bpm</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">110 bpm</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q7</div><div class="q-text">Cardiopulmonary diseases influence the pulse rate. How does the pulse rate change with hypertension and hypotension, respectively?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Increases with hypertension and decreases with hypotension</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Decreases with hypertension and increases with hypotension</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Decreases in both conditions</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Increases in both conditions</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q8</div><div class="q-text">When palpating the arterial pulse, which artery is evaluated as the most accurate reflection of the central aortic pulse?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Radial pulse</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Carotid pulse</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Brachial pulse</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Femoral pulse</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q9</div><div class="q-text">As an experienced clinician, you know it is highly discouraged to check both carotid arteries at the same time (bilaterally). What is the direct clinical reason for this?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Induction of severe tachycardia</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Induction of severe bradycardia</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Possible induction of a syncopal (fainting) episode</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">False measurement of the central aortic pulse</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q10</div><div class="q-text">What is the optimal clinical technique (best practice) for counting a patient's respirations without causing them to alter their breathing pattern?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Ask the patient to hold their breath, then count directly.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Stare directly at the patient's chest and inform them you are checking their breathing.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Count the respirations for 15 seconds and multiply by 4 to be as fast as possible.</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">Continue to hold the patient's extremity after taking the radial pulse as a distraction, and count for one minute.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q11</div><div class="q-text">When evaluating the respiratory rate of an adult, what range is considered normal, and when is the reading classified as abnormal?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">Normal is 14-18; Abnormal is &lt;10 and &gt;20</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Normal is 16-20; Abnormal is &lt;12 and &gt;25</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Normal is 12-20; Abnormal is &lt;10 and &gt;24</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Normal is 22-28; Abnormal is &lt;14 and &gt;30</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q12</div><div class="q-text">Which of the following conditions or factors can cause a slow respiratory rate (Bradypnea) rather than a fast respiratory rate?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">COPD</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Anxiety</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Enhanced body relaxation</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Upper Respiratory Tract Infection (URTI)</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q13</div><div class="q-text">Clinically, how is a fever (or pyrexia) accurately defined based on the provided text?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Body temperature higher than 99.0 °F</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Body temperature higher than the individual's normal steady state</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Body temperature higher than 37.2 °C</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">An increase of internal body temperature by more than 4° Celsius</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q14</div><div class="q-text">If you are using a traditional mercury-filled thermometer to measure a patient's oral temperature, what reading must you shake the thermometer down to before use?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">95.0°F or below</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">96°F (35°C) or below</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">97.8°F or below</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">99.0°F or below</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q15</div><div class="q-text">While measuring the radial pulse rate, which are the correct fingers to use to press firmly on the arterial site?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">The thumb and the index finger</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">The index and middle fingers (first and second fingers)</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">The middle and ring fingers</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Only the index finger</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 9 — Blood Pressure & Transfusion
+═══════════════════════════════════════════════ -->
+<section id="t9" class="topic-section">
+  <h2 class="section-title">Blood Pressure &amp; Blood Transfusion</h2>
+  <p class="section-meta">15 questions · BP measurement, cuff selection, blood products, and transfusion reactions</p>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q1</div><div class="q-text">To estimate the mean arterial pressure from a patient's BP reading, which of the following formulas is correct according to your textbook?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Systolic pressure + Diastolic pressure</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Diastolic pressure + one third of the pulse pressure</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Systolic pressure - Diastolic pressure</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">One third of Systolic pressure + Diastolic pressure</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q2</div><div class="q-text">When selecting an appropriately sized blood pressure cuff, the bladder width and length must meet specific anatomical proportions to avoid "mis-cuffing" errors. What is the ideal proportion?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Bladder length &gt; 50% of the upper arm circumference, and width equals 20%.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Bladder length &gt; 80% of the upper arm circumference, and width equals at least 40%.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Bladder length &gt; 40% of the upper arm circumference, and width equals at least 80%.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Bladder length and width should both encompass 100% of the arm circumference.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q3</div><div class="q-text">During a clinical examination, you decide to use the palpatory method to measure a patient's blood pressure. Which of the following parameters can you accurately determine using this method alone?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">Systolic pressure only</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Diastolic pressure only</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Both Systolic and Diastolic pressures</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Mean arterial pressure</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q4</div><div class="q-text">While preparing to measure blood pressure using the auscultatory method, you estimate the patient's systolic pressure. To what level should you semi-rapidly inflate the cuff before starting deflation?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">10 mmHg greater than the estimated systolic value</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">20 mmHg greater than the estimated diastolic value</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">30 mmHg greater than the estimated systolic value</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Wait until the pulse disappears, then inflate an additional 50 mmHg</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q5</div><div class="q-text">You notice that a medical student recorded a falsely elevated (False High) blood pressure reading for a patient. Which of the following technical errors is the most likely cause of this specific type of error?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">The patient's arm was placed above the level of the heart.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">The blood pressure cuff used was too wide.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">The stethoscope bell was applied too firmly.</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">The inflatable portion of the cuff was too narrow or too short.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q6</div><div class="q-text">According to modern restrictive transfusion guidelines, what is the recommended Hemoglobin (Hb) threshold for transfusing Packed Red Blood Cells (PRBCs) in a patient with coronary artery disease?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">&lt; 7 g/dL</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">&lt; 8 g/dL</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">&lt; 10 g/dL</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Transfuse based on clinical status regardless of the Hb level.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q7</div><div class="q-text">You order a transfusion of 1 unit of Packed Red Blood Cells (PRBCs) for a symptomatic anemic adult. After the transfusion, what is the expected increase in the patient's Hemoglobin (Hb) and Hematocrit (Hct) levels?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Raises Hb by ~2 g/dL and Hct by ~6%</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Raises Hb by ~1 g/dL and Hct by ~3%</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Raises Hb by ~0.5 g/dL and Hct by ~1%</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Raises Hb by ~3 g/dL and Hct by ~5%</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q8</div><div class="q-text">Fresh Frozen Plasma (FFP) contains all clotting factors and has specific indications. In which of the following scenarios is the use of FFP explicitly NOT recommended?</div></div>
+    <div class="q-options">
+      <div class="q-option correct"><div class="opt-letter">A</div><div class="opt-text">Routine prophylaxis in non-bleeding patients</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Disseminated intravascular coagulation (DIC)</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Active bleeding with coagulation factor deficiency</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Massive transfusion protocols</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">A</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q9</div><div class="q-text">A patient is scheduled for an invasive surgical procedure. To minimize the risk of bleeding, the clinical guidelines suggest maintaining the platelet count above a certain threshold. What is the threshold for prophylactic platelet transfusion before most invasive procedures?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">&lt; 10 × 10⁹/L</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">&lt; 20 × 10⁹/L</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">&lt; 50 × 10⁹/L</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Maintain &gt; 100 × 10⁹/L</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q10</div><div class="q-text">You are managing a patient diagnosed with Hypofibrinogenemia. Which of the following blood products is specifically indicated because it contains Fibrinogen, Factor VIII, and von Willebrand factor?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Platelet Concentrates</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Fresh Frozen Plasma (FFP)</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Packed Red Blood Cells (PRBCs)</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">Cryoprecipitate</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q11</div><div class="q-text">You are setting up the IV equipment for a blood transfusion. Which of the following IV fluids is the ONLY one compatible with blood and should be used to prime the tubing?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Dextrose 5% in Water</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Ringer's Lactate</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Normal Saline (0.9% NaCl)</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Half Normal Saline (0.45% NaCl)</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q12</div><div class="q-text">What is the correct protocol regarding the rate of blood administration during the very first 15 minutes of a transfusion?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Run the transfusion rapidly to check for immediate reactions.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Start slowly at approximately 2 mL/min or 120 mL/hr.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Administer half the unit as a bolus, then slow down.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Maintain a constant rate of 250 mL/hr throughout the procedure.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q13</div><div class="q-text">Within 6-12 hours of receiving a blood transfusion, an elderly patient with congestive heart failure develops pulmonary edema due to fluid overload. What is the most appropriate initial treatment for this specific complication (TACO)?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Administer Epinephrine for anaphylaxis.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Provide supportive care only, as it resolves spontaneously.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Slow the transfusion and administer Diuretics.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Give Acetaminophen and antihistamines.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q14</div><div class="q-text">Two hours after starting a blood transfusion, a patient develops acute hypoxemia, and a chest X-ray reveals diffuse infiltrates (ARDS-like presentation). This rare but serious complication is known as Transfusion-Related Acute Lung Injury (TRALI). What is the recommended treatment for TRALI?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Diuretics and slowing the transfusion</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Acetaminophen and antihistamines</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Epinephrine and steroids</div></div>
+      <div class="q-option correct"><div class="opt-letter">D</div><div class="opt-text">Supportive care only</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q15</div><div class="q-text">Massive blood transfusions can lead to specific electrolyte abnormalities. A patient exhibits signs of Hypocalcemia post-transfusion. What is the exact pathophysiological cause of this hypocalcemia as mentioned in your text?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Potassium leaks from stored red blood cells.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Citrate binds to the patient's serum calcium.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Citrate is converted to bicarbonate, leading to alkalosis.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Extensive hemolysis depletes intracellular calcium.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 10 — Musculoskeletal History (placeholder — covered in T4)
+═══════════════════════════════════════════════ -->
+<section id="t10" class="topic-section">
+  <h2 class="section-title">Musculoskeletal History</h2>
+  <p class="section-meta">The musculoskeletal history questions (crystal arthritis, bone pain, Charcot joints, GALS screen, etc.) appear under the <strong>Presenting Symptom</strong> tab in this viewer, as they form a single continuous bank in the source document.</p>
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;color:var(--muted);font-size:0.92rem;">
+    Please navigate to <strong>Presenting Symptom</strong> to view all 15 questions from this topic.
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════
+     TOPIC 11 — Injections & Venepuncture
+═══════════════════════════════════════════════ -->
+<section id="t11" class="topic-section">
+  <h2 class="section-title">Injections &amp; Venepuncture</h2>
+  <p class="section-meta">15 questions · Injection routes, angles, sites, aspiration, and vein access</p>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q1</div><div class="q-text">During your rounds in the internal medicine department, an intern asks you about the rate of medication absorption based on the injection route. Which of the following statements is scientifically correct?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">SC injections absorb faster than IM due to rich blood supply.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">ID injections are absorbed more slowly than IV, IM, or SC injections.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">IM injections are absorbed slower than SC injections.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">IV infusions allow the slowest controlled rate of medication administration.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q2</div><div class="q-text">A patient in the clinic requires a dose of Insulin, and another patient is to receive the Comirnaty (COVID-19) vaccine. What are the correct routes of administration in order, according to the protocol?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">IV for Insulin, IM for Comirnaty</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">SC for Insulin, IM for Comirnaty</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">IM for Insulin, SC for Comirnaty</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">SC for Insulin, ID for Comirnaty</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q3</div><div class="q-text">A urologist is performing a procedure that involves injecting medication into the muscle in the wall of the bladder. What is the precise medical term for this type of injection?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Intraperitoneal injection</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Intradetrusor injection</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Intraosseous injection</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Intracavernous injection</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q4</div><div class="q-text">While educating a diabetic patient on how to self-administer an SC injection in the lower abdomen, what is the most important cautionary advice you must emphasize regarding this site?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Inject directly into the navel for better absorption.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Avoid the 2 inches (5cm) area around the navel.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Use the upper area of the abdomen above the stomach.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Inject strictly in the midline below the umbilicus.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q5</div><div class="q-text">To ensure the medication reaches the correct tissue layer, what is the proper angle of needle insertion for SC injections and IM injections, respectively?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">90° for SC, 45° for IM</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">45° for SC, 90° for IM</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">15° for SC, 90° for IM</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">45° for SC, 45° for IM</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q6</div><div class="q-text">A child in the vaccination unit needs to receive multiple injections in the same extremity. What is the required safe distance between each injection?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Minimum of 0.5 inches</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Minimum of 1 inch</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Minimum of 2 inches</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Minimum of 3 inches</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q7</div><div class="q-text">When administering an intramuscular (IM) injection into the deltoid muscle, how do you anatomically determine the correct site to avoid injury?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">1 inch above the acromion process.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">2–3 fingerbreadths (~2") below the acromion process.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Directly into the bony prominence above the deltoid.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">At the level of the armpit.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q8</div><div class="q-text">When administering a vaccine to a patient, is it necessary to perform aspiration (pulling back on the syringe plunger) after needle insertion and before injecting the medication?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Yes, to ensure the needle is not in a blood vessel.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Yes, but only for IM injections.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">No, it is not necessary to aspirate before administering a vaccine.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">No, but only if using a 45-degree angle.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q9</div><div class="q-text">Based on the guideline tables for skin preparation, if you are preparing to establish venous access, what is the correct disinfection protocol?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Use soap and water only.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Use soap and water, followed by 60–70% alcohol.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Do not use soap and water; use only 60–70% alcohol.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Do not use either soap and water or alcohol.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q10</div><div class="q-text">What is the correct practical guidance for using an alcohol-based solution to disinfect the skin prior to needle insertion?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Use methanol and wipe from the outside towards the centre.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Wipe the area from the centre working outwards, and let it dry completely.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Wipe randomly over the area for 10 seconds and inject immediately while wet.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Apply the solution for 5 seconds and wipe it off with a dry swab.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q11</div><div class="q-text">While preparing medications, you withdrew a dose from a multidose vial. What is the strictly prohibited action (DO NOT) to avoid contamination?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Using a completely new needle and syringe for each withdrawal.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Re-entering the vial with a needle or syringe used on a patient to withdraw medication again.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Not touching the diaphragm of the vial after disinfection with alcohol.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Using a laminar flow cabinet in pharmacies to prepare multiple doses.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q12</div><div class="q-text">A physician had to draw a blood sample from the veins on the dorsum of the hand because the forearm/elbow veins were difficult to access. What are the anatomical disadvantages of these veins that make venepuncture more difficult?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Thick-walled and less mobile.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Deep, large, and perfectly straight.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Thin-walled, easily moveable, and superficial.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Surrounded by rich muscle tissue providing firm support.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q13</div><div class="q-text">A patient admitted to the inpatient unit requires multiple venepunctures. What is the correct medical rule for selecting vein sites each time?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Use proximal veins first, then move distally.</div></div>
+      <div class="q-option correct"><div class="opt-letter">B</div><div class="opt-text">Use distal veins first, with subsequent venepunctures proximal to previous sites.</div></div>
+      <div class="q-option"><div class="opt-letter">C</div><div class="opt-text">Always use the exact same puncture site to avoid creating multiple wounds.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Use veins close to arteries to ensure adequate blood flow.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">B</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q14</div><div class="q-text">During the assessment of veins (palpation), which of the following characteristics indicate that the vein is excellent and suitable for venepuncture?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Sclerosed and fibrosed.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Tortuous and fragile.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Bouncy, soft, and straight.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Thrombosed with a small lumen.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">D</span></div>
+  </div>
+
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">Q15</div><div class="q-text">If you encounter difficulty finding a suitable vein for a patient, which of the following techniques is medically correct for improving access and vein prominence?</div></div>
+    <div class="q-options">
+      <div class="q-option"><div class="opt-letter">A</div><div class="opt-text">Raise the arm above the heart level.</div></div>
+      <div class="q-option"><div class="opt-letter">B</div><div class="opt-text">Apply a cold compress (Ice) to the area.</div></div>
+      <div class="q-option correct"><div class="opt-letter">C</div><div class="opt-text">Lower the arm below heart level and apply heat.</div></div>
+      <div class="q-option"><div class="opt-letter">D</div><div class="opt-text">Stroke the vein in a proximal direction towards the heart.</div></div>
+    </div>
+    <div class="q-footer"><span class="answer-label">Correct answer</span><span class="answer-val">C</span></div>
+  </div>
+</section>
+
+</main>
+
+<script>
+function showTopic(id, btn) {
+  document.querySelectorAll('.topic-section').forEach(s => s.classList.remove('visible'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('visible');
+  btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
